@@ -15,20 +15,25 @@
 3. Check `~/pCloudDrive/1-Projects/Claude/claude-projects/x-generator/x-generator.md` for full plan
 
 ## Current Status
-**Status:** BACKEND COMPLETE - Docker configured
+**Status:** FRONTEND COMPLETE - X OAuth working, posting functional
 
-### Completed (Dec 18, 2024)
-- ✅ Phase 1: Core Infrastructure (config, DB clients, virtue support)
-- ✅ Phase 2: LLM & RAG (OpenAI, Anthropic, virtue prompts)
-- ✅ Phase 3: Generation & Twitter (generator, X OAuth2)
-- ✅ Phase 4: Scheduler (APScheduler, randomizer, blackout)
-- ✅ Phase 5: API Routes (generate, posts, queue, settings, trending, chat, auth, scheduler)
-- ✅ Phase 6: Setup files (requirements.txt, .env.example, scripts/setup_supabase.sql)
-- ✅ Docker configuration (Dockerfile, docker-compose.yml)
+### Last Session: Dec 18, 2024
+- Added React frontend with all pages (Dashboard, Generate, Approval, Queue, Posted, Trending, Settings)
+- X OAuth authentication working (connected as @Cato_Pine)
+- Post Now functionality works from Trending page
+- Fixed multiple backend bugs (timezone, rate limits, scheduler initialization)
 
-### Known Issues
-1. **Database**: User chose to share Supabase project with auto-twitter-stoic
-   - Run `scripts/setup_supabase.sql` to add virtue column and new tables
+### Completed
+- ✅ Phase 1-6: Backend complete
+- ✅ Phase 7: React Frontend (Vite + TailwindCSS + React Query)
+- ✅ Docker multi-container deployment
+- ✅ X OAuth2 with PKCE
+
+### Known Issues / Next Steps
+1. **Reply posting**: Replies post as standalone tweets instead of actual replies
+   - Need to run SQL: `ALTER TABLE posts ADD COLUMN IF NOT EXISTS reply_to_tweet_id TEXT;`
+   - Code is ready - just needs the database column
+2. Settings page UI could show X connection status better
 
 ## Development Setup
 
