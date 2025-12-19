@@ -13,10 +13,11 @@ oauth_states = {}
 
 
 @router.get("/x/login")
-async def initiate_x_login(request: Request):
+async def initiate_x_login(request: Request, redirect: bool = True):
     """
     Initiate X OAuth2 login flow.
-    Returns the authorization URL to redirect the user to.
+    If redirect=true (default), redirects to X authorization page.
+    If redirect=false, returns the authorization URL as JSON.
     """
     oauth = OAuthManager()
 
@@ -27,6 +28,9 @@ async def initiate_x_login(request: Request):
 
     auth_url = oauth.get_authorization_url(state, pkce["code_challenge"])
 
+    if redirect:
+        return RedirectResponse(url=auth_url)
+
     return {"authorization_url": auth_url, "state": state}
 
 
@@ -36,6 +40,8 @@ async def x_oauth_callback(code: str, state: str):
     Handle X OAuth2 callback.
     Exchanges the authorization code for tokens.
     """
+    import os
+
     if state not in oauth_states:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
 
@@ -47,7 +53,9 @@ async def x_oauth_callback(code: str, state: str):
     if not tokens:
         raise HTTPException(status_code=500, detail="Failed to exchange code for tokens")
 
-    return {"message": "Authentication successful", "authenticated": True}
+    # Redirect to frontend after successful auth
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    return RedirectResponse(url=f"{frontend_url}/settings?auth=success")
 
 
 @router.get("/x/status", response_model=AuthStatusResponse)

@@ -90,7 +90,12 @@ async def resume_scheduler(request: Request):
 @router.post("/post-now/{post_id}")
 async def post_now(request: Request, post_id: str):
     """Immediately post a specific approved post."""
-    scheduler = get_scheduler(request)
+    # Use existing scheduler or create one on-demand for posting
+    if hasattr(request.app.state, "scheduler"):
+        scheduler = request.app.state.scheduler
+    else:
+        scheduler = PostingScheduler()
+
     result = await scheduler.post_now(post_id)
 
     if result.get("error"):

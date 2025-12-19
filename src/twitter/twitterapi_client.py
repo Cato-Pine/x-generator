@@ -62,12 +62,11 @@ class TwitterAPIClient:
 
                 try:
                     response = await client.get(
-                        f"{self.BASE_URL}/tweet/search",
+                        f"{self.BASE_URL}/tweet/advanced_search",
                         headers=self._get_headers(),
                         params={
                             "query": topic,
-                            "type": "Top",
-                            "count": min(limit - len(results), 20)
+                            "queryType": "Top",
                         }
                     )
                     response.raise_for_status()
@@ -75,15 +74,16 @@ class TwitterAPIClient:
 
                     tweets = data.get("tweets", [])
                     for tweet in tweets:
+                        author = tweet.get("author", {})
                         results.append(TrendingPost(
                             tweet_id=tweet.get("id", ""),
                             content=tweet.get("text", ""),
-                            username=tweet.get("user", {}).get("screen_name", "unknown"),
-                            likes=tweet.get("favorite_count", 0),
-                            retweets=tweet.get("retweet_count", 0),
+                            username=author.get("userName", "unknown"),
+                            likes=tweet.get("likeCount", 0),
+                            retweets=tweet.get("retweetCount", 0),
                             relevance_score=self._calculate_relevance(
-                                tweet.get("favorite_count", 0),
-                                tweet.get("retweet_count", 0)
+                                tweet.get("likeCount", 0),
+                                tweet.get("retweetCount", 0)
                             )
                         ))
 

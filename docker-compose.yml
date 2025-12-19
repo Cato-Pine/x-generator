@@ -1,0 +1,24 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - chroma_data:/app/chroma_db
+    env_file:
+      - .env
+    environment:
+      - CHROMA_PERSIST_PATH=/app/chroma_db
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  chroma_data:

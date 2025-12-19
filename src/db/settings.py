@@ -77,11 +77,16 @@ class SettingsDB:
 
     def get_rate_limits(self) -> dict:
         """Get the X API rate limit settings (Free tier defaults)."""
-        return self.get_value("rate_limits", {
+        defaults = {
             "max_daily_tweets": 17,
             "max_tweets_per_hour": 17,
             "enabled": True
-        })
+        }
+        stored = self.get_value("rate_limits", {})
+        # Normalize old format (daily_posts) to new format (max_daily_tweets)
+        if "daily_posts" in stored and "max_daily_tweets" not in stored:
+            stored["max_daily_tweets"] = stored["daily_posts"]
+        return {**defaults, **stored}
 
     def set_rate_limits(self, limits: dict) -> dict:
         """Update rate limit settings."""

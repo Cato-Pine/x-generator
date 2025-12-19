@@ -5,7 +5,8 @@ import secrets
 import hashlib
 import base64
 from typing import Optional, Dict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from urllib.parse import urlencode
 from src.db.supabase_client import get_supabase
 
 
@@ -32,18 +33,17 @@ class OAuthManager:
 
     def get_authorization_url(self, state: str, code_challenge: str) -> str:
         """Generate the X OAuth2 authorization URL."""
-        scopes = "tweet.read tweet.write users.read offline.access"
+        params = {
+            "response_type": "code",
+            "client_id": self.client_id,
+            "redirect_uri": self.redirect_uri,
+            "scope": "tweet.read tweet.write users.read offline.access",
+            "state": state,
+            "code_challenge": code_challenge,
+            "code_challenge_method": "S256",
+        }
 
-        return (
-            f"https://twitter.com/i/oauth2/authorize"
-            f"?response_type=code"
-            f"&client_id={self.client_id}"
-            f"&redirect_uri={self.redirect_uri}"
-            f"&scope={scopes}"
-            f"&state={state}"
-            f"&code_challenge={code_challenge}"
-            f"&code_challenge_method=S256"
-        )
+        return f"https://twitter.com/i/oauth2/authorize?{urlencode(params)}"
 
     async def exchange_code(self, code: str, code_verifier: str) -> Optional[Dict]:
         """Exchange authorization code for tokens."""
@@ -144,7 +144,7 @@ class OAuthManager:
         expires_at = tokens.get("expires_at")
         if expires_at:
             expiry = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
-            if expiry <= datetime.utcnow() + timedelta(minutes=5):
+            if expiry <= datetime.now(timezone.utc) + timedelta(minutes=5):
                 refreshed = await self.refresh_tokens()
                 if refreshed:
                     return refreshed.get("access_token")

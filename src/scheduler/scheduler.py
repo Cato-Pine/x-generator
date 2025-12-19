@@ -204,13 +204,14 @@ class PostingScheduler:
         try:
             content = post.get("content", "")
             format_type = post.get("format_type", "short")
+            reply_to_tweet_id = post.get("reply_to_tweet_id")
 
             if format_type == "thread":
                 tweets = content.split("\n\n")
                 result = await self.x_client.post_thread(tweets)
                 tweet_id = result[0].get("tweet_id") if result else None
             else:
-                result = await self.x_client.post_tweet(content)
+                result = await self.x_client.post_tweet(content, reply_to=reply_to_tweet_id)
                 tweet_id = result.get("tweet_id") if result else None
 
             if tweet_id:

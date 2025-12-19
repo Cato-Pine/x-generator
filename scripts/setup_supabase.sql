@@ -1,5 +1,6 @@
 -- x-generator Supabase Database Schema
 -- Run this in your Supabase SQL Editor to set up the database
+-- Safe to run multiple times - handles existing tables from auto-twitter-stoic
 
 -- =============================================================================
 -- POSTS TABLE
@@ -20,6 +21,55 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add new columns to existing posts table (safe if columns already exist)
+DO $$
+BEGIN
+    -- Add virtue column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'virtue') THEN
+        ALTER TABLE posts ADD COLUMN virtue TEXT;
+    END IF;
+    -- Add post_type column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'post_type') THEN
+        ALTER TABLE posts ADD COLUMN post_type TEXT DEFAULT 'original';
+    END IF;
+    -- Add format_type column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'format_type') THEN
+        ALTER TABLE posts ADD COLUMN format_type TEXT DEFAULT 'short';
+    END IF;
+    -- Add x_post_id column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'x_post_id') THEN
+        ALTER TABLE posts ADD COLUMN x_post_id TEXT;
+    END IF;
+    -- Add approved_at column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'approved_at') THEN
+        ALTER TABLE posts ADD COLUMN approved_at TIMESTAMPTZ;
+    END IF;
+    -- Add recycle_count column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'recycle_count') THEN
+        ALTER TABLE posts ADD COLUMN recycle_count INTEGER DEFAULT 0;
+    END IF;
+    -- Add updated_at column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'updated_at') THEN
+        ALTER TABLE posts ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
+    END IF;
+    -- Add posted_at column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'posted_at') THEN
+        ALTER TABLE posts ADD COLUMN posted_at TIMESTAMPTZ;
+    END IF;
+    -- Add reply_to_tweet_id column for replies
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'reply_to_tweet_id') THEN
+        ALTER TABLE posts ADD COLUMN reply_to_tweet_id TEXT;
+    END IF;
+    -- Add reply_to_content column for replies
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'reply_to_content') THEN
+        ALTER TABLE posts ADD COLUMN reply_to_content TEXT;
+    END IF;
+    -- Add reply_to_username column for replies
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'reply_to_username') THEN
+        ALTER TABLE posts ADD COLUMN reply_to_username TEXT;
+    END IF;
+END $$;
 
 -- Index for common queries
 CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
