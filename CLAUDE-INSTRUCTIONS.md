@@ -17,7 +17,13 @@
 ## Current Status
 **Status:** FRONTEND COMPLETE - X OAuth working, posting functional
 
-### Last Session: Dec 18, 2024
+### Last Session: Dec 19, 2024
+- Set up pCloud secrets management for .env files
+- Created .env template at `P:\1-Projects\Claude\secrets\x-generator\.env`
+- Added Supabase + X API credentials to .env
+- Preparing for DigitalOcean deployment
+
+### Previous Session: Dec 18, 2024
 - Added React frontend with all pages (Dashboard, Generate, Approval, Queue, Posted, Trending, Settings)
 - X OAuth authentication working (connected as @Cato_Pine)
 - Post Now functionality works from Trending page
@@ -30,10 +36,15 @@
 - ✅ X OAuth2 with PKCE
 
 ### Known Issues / Next Steps
-1. **Reply posting**: Replies post as standalone tweets instead of actual replies
+1. **Deploy to DigitalOcean** (do-stoic server)
+   - Copy .env from `P:\1-Projects\Claude\secrets\x-generator\.env`
+   - Still needs: OPENAI_API_KEY or ANTHROPIC_API_KEY, TWITTERAPI_IO_KEY
+   - Run `scripts/setup_supabase.sql` in Supabase SQL editor
+   - Add to nevins.cloud dashboard
+2. **Reply posting**: Replies post as standalone tweets instead of actual replies
    - Need to run SQL: `ALTER TABLE posts ADD COLUMN IF NOT EXISTS reply_to_tweet_id TEXT;`
    - Code is ready - just needs the database column
-2. Settings page UI could show X connection status better
+3. Settings page UI could show X connection status better
 
 ## Development Setup
 
